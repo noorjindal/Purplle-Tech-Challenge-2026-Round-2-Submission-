@@ -1,0 +1,37 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      # persistent DB + seed data (POS csv + layout copied in on first run)
+      - intel_data:/data
+      - ./data/store_layout.json:/data/store_layout.json:ro
+      - ./data/pos_transactions.csv:/data/pos_transactions.csv:ro
+    environment:
+      STORE_DB_PATH: /data/store_intel.db
+      POS_CSV_PATH: /data/pos_transactions.csv
+      STORE_LAYOUT_PATH: /data/store_layout.json
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Optional live dashboard (Part E). Static file server for dashboard/index.html.
+  dashboard:
+    image: python:3.12-slim
+    working_dir: /web
+    volumes:
+      - ./dashboard:/web:ro
+    command: ["python", "-m", "http.server", "8080"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
+
+volumes:
+  intel_data:

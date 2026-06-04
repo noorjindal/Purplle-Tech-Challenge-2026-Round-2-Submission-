@@ -1,0 +1,149 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>APEX · STORE INTELLIGENCE</title>
+<style>
+  /* Control-room / NOC aesthetic: near-black, phosphor amber + signal cyan,
+     monospaced data, dense grid. Deliberately not a generic dashboard. */
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo:wght@400;600;800&display=swap');
+
+  :root{
+    --bg:#0a0c0f; --panel:#11151a; --line:#1d242c;
+    --amber:#ffb000; --cyan:#3fe0d0; --red:#ff4d4d; --dim:#5a6573; --ink:#e8eef2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;
+    background-image:radial-gradient(circle at 50% 0,#13181e 0,#0a0c0f 60%);
+    min-height:100vh;padding:22px;}
+  .top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+  h1{font-size:20px;letter-spacing:.32em;font-weight:800}
+  h1 b{color:var(--amber)}
+  .meta{font-family:'Space Mono',monospace;color:var(--dim);font-size:12px}
+  .live{color:var(--cyan)}
+  .live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:var(--cyan);margin-right:7px;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:4px;
+    padding:16px 18px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:var(--amber)}
+  .k{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase}
+  .v{font-family:'Space Mono',monospace;font-size:38px;font-weight:700;margin-top:8px;line-height:1}
+  .v small{font-size:15px;color:var(--dim)}
+  .span2{grid-column:span 2}.span4{grid-column:span 4}
+  .funnel-row{display:flex;align-items:center;gap:12px;margin:9px 0;font-family:'Space Mono',monospace}
+  .bar{height:22px;background:linear-gradient(90deg,var(--amber),#ff7a00);border-radius:2px;min-width:2px}
+  .funnel-row .lbl{width:120px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+  .funnel-row .cnt{width:46px;text-align:right;font-weight:700}
+  .funnel-row .drop{color:var(--red);font-size:11px;width:60px}
+  table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:12px}
+  th{color:var(--dim);text-align:left;font-weight:400;letter-spacing:.12em;font-size:10px;
+    text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--line)}
+  td{padding:7px 8px;border-bottom:1px solid #151a20}
+  .heat{display:inline-block;height:9px;border-radius:1px;background:var(--cyan)}
+  .anom{padding:10px 12px;border-left:3px solid var(--dim);margin:8px 0;background:#0d1116;font-size:13px}
+  .anom.WARN{border-color:var(--amber)} .anom.CRITICAL{border-color:var(--red)} .anom.INFO{border-color:var(--cyan)}
+  .anom .sev{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--dim)}
+  .sub{font-size:11px;color:var(--dim);margin-top:5px;font-family:'Space Mono',monospace}
+  select{background:#0d1116;color:var(--ink);border:1px solid var(--line);font-family:'Space Mono',monospace;
+    padding:5px 9px;border-radius:3px;font-size:12px}
+  .empty{color:var(--dim);font-style:italic;padding:8px;font-family:'Space Mono',monospace;font-size:12px}
+</style>
+
+<div class="top">
+  <h1>APEX <b>·</b> STORE INTELLIGENCE</h1>
+  <div class="meta">
+    STORE <select id="store"><option>ST1008</option><option selected>ST1076</option></select>
+    &nbsp;·&nbsp; <span class="live" id="clock">CONNECTING…</span>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card"><div class="k">Unique Visitors</div><div class="v" id="m-visitors">—</div></div>
+  <div class="card"><div class="k">Conversion Rate</div><div class="v" id="m-conv">—</div>
+    <div class="sub" id="m-conv-sub"></div></div>
+  <div class="card"><div class="k">Queue Depth</div><div class="v" id="m-queue">—</div></div>
+  <div class="card"><div class="k">Abandonment</div><div class="v" id="m-aband">—</div></div>
+
+  <div class="card span2">
+    <div class="k">Conversion Funnel · session unit</div>
+    <div id="funnel" style="margin-top:14px"></div>
+  </div>
+  <div class="card span2">
+    <div class="k">Zone Heatmap <span id="heat-conf" style="color:var(--amber)"></span></div>
+    <table style="margin-top:10px"><thead><tr><th>Zone</th><th>Visits</th><th>Dwell s</th><th style="width:38%">Intensity</th></tr></thead>
+      <tbody id="heat"></tbody></table>
+  </div>
+
+  <div class="card span4">
+    <div class="k">Active Anomalies</div>
+    <div id="anoms" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<script>
+  // Dashboard polls the live API. Configurable via ?api= ; defaults to :8000.
+  const API = new URLSearchParams(location.search).get('api') || 'http://localhost:8000';
+  const $ = id => document.getElementById(id);
+  let store = $('store').value;
+  $('store').onchange = e => { store = e.target.value; tick(); };
+
+  async function getJSON(path){
+    const r = await fetch(API + path);
+    if(!r.ok) throw new Error(path + ' ' + r.status);
+    return r.json();
+  }
+
+  function renderMetrics(m){
+    $('m-visitors').textContent = m.unique_visitors;
+    $('m-conv').innerHTML = (m.conversion_rate*100).toFixed(1) + '<small>%</small>';
+    $('m-conv-sub').textContent = m.converted_visitors + ' / ' + m.unique_visitors + ' converted';
+    $('m-queue').textContent = m.current_queue_depth;
+    $('m-aband').innerHTML = (m.abandonment_rate*100).toFixed(0) + '<small>%</small>';
+  }
+
+  function renderFunnel(f){
+    const max = Math.max(...f.stages.map(s=>s.count), 1);
+    $('funnel').innerHTML = f.stages.map(s=>`
+      <div class="funnel-row">
+        <span class="lbl">${s.stage.replace('_',' ')}</span>
+        <span class="cnt">${s.count}</span>
+        <span class="bar" style="width:${(s.count/max)*100*0.55}%"></span>
+        <span class="drop">${s.drop_off_pct>0?'-'+s.drop_off_pct+'%':''}</span>
+      </div>`).join('');
+  }
+
+  function renderHeat(h){
+    $('heat-conf').textContent = h.data_confidence==='LOW' ? '· LOW CONFIDENCE (<20 sessions)' : '';
+    if(!h.zones.length){ $('heat').innerHTML = '<tr><td colspan=4 class="empty">no zone data yet</td></tr>'; return; }
+    $('heat').innerHTML = h.zones.slice(0,8).map(z=>`
+      <tr><td>${z.zone_id}</td><td>${z.visit_count}</td><td>${z.avg_dwell_sec}</td>
+      <td><span class="heat" style="width:${z.visit_score}%"></span></td></tr>`).join('');
+  }
+
+  function renderAnoms(a){
+    if(!a.active_anomalies.length){ $('anoms').innerHTML='<div class="empty">no active anomalies — all systems nominal</div>'; return; }
+    $('anoms').innerHTML = a.active_anomalies.map(x=>`
+      <div class="anom ${x.severity}">
+        <span class="sev">${x.severity} · ${x.type}</span><br>${x.suggested_action}
+      </div>`).join('');
+  }
+
+  async function tick(){
+    try{
+      const [m,f,h,a] = await Promise.all([
+        getJSON(`/stores/${store}/metrics`),
+        getJSON(`/stores/${store}/funnel`),
+        getJSON(`/stores/${store}/heatmap`),
+        getJSON(`/stores/${store}/anomalies`),
+      ]);
+      renderMetrics(m); renderFunnel(f); renderHeat(h); renderAnoms(a);
+      $('clock').textContent = 'LIVE · ' + new Date().toLocaleTimeString();
+    }catch(e){
+      $('clock').textContent = 'API UNREACHABLE @ ' + API;
+      $('clock').style.color = 'var(--red)';
+    }
+  }
+  tick(); setInterval(tick, 3000);   // poll every 3s -> live updating
+</script>

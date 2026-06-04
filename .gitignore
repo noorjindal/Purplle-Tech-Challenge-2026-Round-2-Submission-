@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.db
+*.jsonl
+!data/sample_events.jsonl
+yolov8*.pt
+.pytest_cache/
+.coverage
+data/store_intel.db
+events_*.jsonl

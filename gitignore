@@ -1,0 +1,31 @@
+# Model weights (too large for GitHub — download separately)
+*.pt
+*.pth
+*.onnx
+
+# Generated output files
+*.jsonl
+events_*.jsonl
+
+# Debug frames
+frame_*.jpg
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.DS_Store
+
+# Docker volumes / DB
+*.db
+*.sqlite

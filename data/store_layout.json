@@ -1,0 +1,60 @@
+{
+  "_comment": "Hand-encoded from Store_1-layout.png and store_2-layout.png. The original challenge ZIP did not include store_layout.json, so zones were reconstructed from the architectural floor plans. Zone polygons are in NORMALISED image coordinates (0..1, origin top-left) relative to the MAIN-FLOOR camera frame. Re-calibrate `polygon` values once real camera frames are available; the schema and IDs are stable.",
+  "schema_version": "1.0",
+  "stores": [
+    {
+      "store_id": "ST1008",
+      "store_code": "store_1008",
+      "city": "BLR",
+      "display_name": "Apex Retail / Purplle - Store 1008",
+      "open_hours": { "open": "11:00", "close": "21:30", "tz": "Asia/Kolkata" },
+      "cameras": [
+        { "camera_id": "CAM1", "role": "entry",   "covers_zones": ["ENTRY_THRESHOLD"], "overlaps_with": ["CAM2"] },
+        { "camera_id": "CAM2", "role": "floor",   "covers_zones": ["SALM","TFS","MINIMALIST","AQUALOGI","FOXTALE","JC","FAC","MARS_NYBAE","MENS","LOREAL","BEAUT","NAIL_FRAGRANCE","MAKEUP_UNIT","FOH"], "overlaps_with": ["CAM1","CAM3"] },
+        { "camera_id": "CAM3", "role": "billing", "covers_zones": ["CASH_COUNTER","ACCESSORIES"], "overlaps_with": ["CAM2"] }
+      ],
+      "zones": [
+        { "zone_id": "ENTRY_THRESHOLD", "zone_name": "Entry Threshold", "zone_type": "THRESHOLD", "is_revenue_zone": false, "polygon": [[0.30,0.55],[0.72,0.55],[0.72,0.95],[0.30,0.95]] },
+        { "zone_id": "SALM",            "zone_name": "Salm",            "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.12,0.05],[0.20,0.05],[0.20,0.18],[0.12,0.18]] },
+        { "zone_id": "TFS",             "zone_name": "TFS",             "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.20,0.05],[0.29,0.05],[0.29,0.18],[0.20,0.18]] },
+        { "zone_id": "MINIMALIST",      "zone_name": "Minimalist",      "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.50,0.05],[0.60,0.05],[0.60,0.18],[0.50,0.18]] },
+        { "zone_id": "AQUALOGI",        "zone_name": "Aqualogi",        "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.60,0.05],[0.70,0.05],[0.70,0.18],[0.60,0.18]] },
+        { "zone_id": "FOXTALE",         "zone_name": "Foxtale",         "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.70,0.05],[0.79,0.05],[0.79,0.18],[0.70,0.18]] },
+        { "zone_id": "JC",              "zone_name": "JC",              "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.79,0.05],[0.89,0.05],[0.89,0.18],[0.79,0.18]] },
+        { "zone_id": "FAC",            "zone_name": "Faces Canada",     "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.20,0.82],[0.34,0.82],[0.34,0.96],[0.20,0.96]] },
+        { "zone_id": "MARS_NYBAE",     "zone_name": "Mars + Nybae",     "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.44,0.82],[0.54,0.82],[0.54,0.96],[0.44,0.96]] },
+        { "zone_id": "MENS",           "zone_name": "Mens",            "zone_type": "SHELF",      "is_revenue_zone": true,  "polygon": [[0.54,0.82],[0.62,0.82],[0.62,0.96],[0.54,0.96]] },
+        { "zone_id": "LOREAL",         "zone_name": "L'Oreal",         "zone_type": "SHELF",      "is_revenue_zone": true,  "polygon": [[0.72,0.82],[0.82,0.82],[0.82,0.96],[0.72,0.96]] },
+        { "zone_id": "BEAUT",          "zone_name": "Beaut",           "zone_type": "SHELF",      "is_revenue_zone": true,  "polygon": [[0.82,0.82],[0.90,0.82],[0.90,0.96],[0.82,0.96]] },
+        { "zone_id": "NAIL_FRAGRANCE", "zone_name": "Nail & Fragrance Unit", "zone_type": "GONDOLA", "is_revenue_zone": true, "polygon": [[0.31,0.40],[0.39,0.40],[0.39,0.60],[0.31,0.60]] },
+        { "zone_id": "MAKEUP_UNIT",    "zone_name": "Makeup Unit",     "zone_type": "MAKEUP",     "is_revenue_zone": true,  "polygon": [[0.52,0.36],[0.64,0.36],[0.64,0.62],[0.52,0.62]] },
+        { "zone_id": "ACCESSORIES",    "zone_name": "Accessories",     "zone_type": "SHELF",      "is_revenue_zone": true,  "polygon": [[0.90,0.62],[0.98,0.62],[0.98,0.78],[0.90,0.78]] },
+        { "zone_id": "CASH_COUNTER",   "zone_name": "Cash Counter",    "zone_type": "BILLING",    "is_revenue_zone": false, "polygon": [[0.82,0.30],[0.96,0.30],[0.96,0.55],[0.82,0.55]] },
+        { "zone_id": "FOH",            "zone_name": "Front of House",  "zone_type": "AISLE",      "is_revenue_zone": false, "polygon": [[0.30,0.20],[0.80,0.20],[0.80,0.80],[0.30,0.80]] }
+      ]
+    },
+    {
+      "store_id": "ST1076",
+      "store_code": "store_1076",
+      "city": "MUM",
+      "display_name": "Apex Retail / Purplle - Store 1076",
+      "open_hours": { "open": "11:00", "close": "21:30", "tz": "Asia/Kolkata" },
+      "cameras": [
+        { "camera_id": "CAM1", "role": "entry",   "covers_zones": ["ENTRY_THRESHOLD"], "overlaps_with": ["CAM2"] },
+        { "camera_id": "CAM2", "role": "floor",   "covers_zones": ["WALL_UNIT_BLOCK_L","WALL_UNIT_BLOCK_R","WALL_UNIT_BLOCK_TOP","MK_GONDOLA_1","MK_GONDOLA_2","MAKEUP_UNIT","FOH"], "overlaps_with": ["CAM1","CAM3"] },
+        { "camera_id": "CAM3", "role": "billing", "covers_zones": ["CASH_COUNTER"], "overlaps_with": ["CAM2"] }
+      ],
+      "zones": [
+        { "zone_id": "ENTRY_THRESHOLD",    "zone_name": "Entry Threshold",       "zone_type": "THRESHOLD", "is_revenue_zone": false, "polygon": [[0.34,0.86],[0.62,0.86],[0.62,1.00],[0.34,1.00]] },
+        { "zone_id": "WALL_UNIT_BLOCK_L",  "zone_name": "Left Wall Units (1-6)", "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.04,0.45],[0.16,0.45],[0.16,0.92],[0.04,0.92]] },
+        { "zone_id": "WALL_UNIT_BLOCK_R",  "zone_name": "Right Wall Units (13-19)","zone_type": "SHELF",   "is_revenue_zone": true,  "polygon": [[0.84,0.45],[0.96,0.45],[0.96,0.92],[0.84,0.92]] },
+        { "zone_id": "WALL_UNIT_BLOCK_TOP","zone_name": "Top Wall Units (7-12)", "zone_type": "SHELF",     "is_revenue_zone": true,  "polygon": [[0.14,0.50],[0.82,0.50],[0.82,0.58],[0.14,0.58]] },
+        { "zone_id": "MK_GONDOLA_1",       "zone_name": "Makeup Gondola 1",      "zone_type": "GONDOLA",   "is_revenue_zone": true,  "polygon": [[0.30,0.74],[0.42,0.74],[0.42,0.84],[0.30,0.84]] },
+        { "zone_id": "MK_GONDOLA_2",       "zone_name": "Makeup Gondola 2",      "zone_type": "GONDOLA",   "is_revenue_zone": true,  "polygon": [[0.26,0.60],[0.38,0.60],[0.38,0.70],[0.26,0.70]] },
+        { "zone_id": "MAKEUP_UNIT",        "zone_name": "Makeup Unit",           "zone_type": "MAKEUP",    "is_revenue_zone": true,  "polygon": [[0.62,0.66],[0.74,0.66],[0.74,0.86],[0.62,0.86]] },
+        { "zone_id": "CASH_COUNTER",       "zone_name": "Cash Counter",          "zone_type": "BILLING",   "is_revenue_zone": false, "polygon": [[0.44,0.56],[0.58,0.56],[0.58,0.68],[0.44,0.68]] },
+        { "zone_id": "FOH",                "zone_name": "Front of House",        "zone_type": "AISLE",     "is_revenue_zone": false, "polygon": [[0.16,0.58],[0.84,0.58],[0.84,0.86],[0.16,0.86]] }
+      ]
+    }
+  ]
+}
